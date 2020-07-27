@@ -22,12 +22,33 @@ class Game:
         for y in range(1, 40):
             for x in range(1, 80):
                 self.stdscr.addstr(y, x, self._cells[y][x])
+        self.stdscr.refresh()
 
     def _read_start(self, filename):
         self._cells = [[' ' for x in range(80)] for y in range(40)]
         with open(filename, "r") as data_file:
             for (x, y) in json.load(data_file)["coord"]:
                 self._cells[x][y] = '*'
+
+    def _get_live_neighbours(self, x, y):
+        cnt = 0
+        if (x < 79) and (self._cells[y][x+1] == '*'):
+            cnt += 1
+        if (y < 38) and (self._cells[y+1][x] == '*'):
+            cnt += 1
+        if (x < 79) and (y < 38) and (self._cells[y+1][x+1] == '*'):
+            cnt += 1
+        if (x > 1) and (self._cells[y][x-1] == '*'):
+            cnt += 1
+        if (y > 1) and (self._cells[y-1][x] == '*'):
+            cnt += 1
+        if (x > 1) and (y > 1) and (self._cells[y-1][x-1] == '*'):
+            cnt += 1
+        if (x < 78) and (y > 1) and (self._cells[y-1][x+1] == '*'):
+            cnt += 1
+        if (x > 1) and (y < 38) and (self._cells[y+1][x-1] == '*'):
+            cnt += 1
+        return cnt
 
     def __init__(self, stdscr, filename="start.json"):
         self.stdscr = stdscr
@@ -36,4 +57,15 @@ class Game:
         self._read_start(filename)
 
     def update(self, key):
+        new_cells = [[' ' for x in range(80)] for y in range(40)]
+        for y in range(1, 40):
+            for x in range(1, 80):
+                if (self._cells[y][x] == ' '):
+                    if (self._get_live_neighbours(x, y) == 3):
+                        new_cells[y][x] = '*'
+                else:
+                    if (self._get_live_neighbours(x, y) in [2, 3]):
+                        new_cells[y][x] = '*'
+
+        self._cells = new_cells
         self._draw_cells()

@@ -21,7 +21,7 @@ def main(stdscr):
             key = stdscr.getkey()
         except curses.error:
             pass
-        time.sleep(0.03)
+        time.sleep(1)
         game.update(key)
 
 
