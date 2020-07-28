@@ -1,5 +1,6 @@
 import curses
 from curses import wrapper
+import sys
 import time
 
 from game import Game
@@ -13,7 +14,10 @@ def main(stdscr):
     curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_GREEN)
 
     stdscr.nodelay(True)
-    game = Game(stdscr)
+    filename = "start.data"
+    if (len(sys.argv) > 1):
+        filename = sys.argv[1]
+    game = Game(stdscr, filename)
 
     while True:
         key = None
@@ -21,7 +25,7 @@ def main(stdscr):
             key = stdscr.getkey()
         except curses.error:
             pass
-        time.sleep(1)
+        time.sleep(0.3)
         game.update(key)
 
 

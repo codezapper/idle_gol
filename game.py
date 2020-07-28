@@ -26,9 +26,19 @@ class Game:
 
     def _read_start(self, filename):
         self._cells = [[' ' for x in range(80)] for y in range(40)]
-        with open(filename, "r") as data_file:
-            for (x, y) in json.load(data_file)["coord"]:
-                self._cells[x][y] = '*'
+        try:
+            if (filename.endswith(".json")):
+                with open(filename, "r") as data_file:
+                    for (x, y) in json.load(data_file)["coord"]:
+                        self._cells[y][x] = '*'
+            else:
+                with open(filename, "r") as data_file:
+                    rows = data_file.readlines()
+                    for y in range(len(self._cells)):
+                        for x in range(len(self._cells[0])):
+                            self._cells[y][x] = rows[y][x]
+        except FileNotFoundError:
+            self.stdscr.addstr(0, 0, "Error reading input file")
 
     def _get_live_neighbours(self, x, y):
         cnt = 0
@@ -50,7 +60,7 @@ class Game:
             cnt += 1
         return cnt
 
-    def __init__(self, stdscr, filename="start.json"):
+    def __init__(self, stdscr, filename="start.data"):
         self.stdscr = stdscr
         self.start_time = time.time() * TIME_MULTIPLIER
         self._draw_grid()
